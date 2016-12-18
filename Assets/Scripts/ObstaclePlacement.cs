@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ObstaclePlacement : MonoBehaviour
 {
@@ -15,8 +16,28 @@ public class ObstaclePlacement : MonoBehaviour
     }
     public Color[] colors;          // 0 - light / 1 - dark / 2 - finish
 
+    [Header("UI Elements")]
+    public GameObject blackHighlight;
+    public GameObject redHighlight;
+    public Text blackNumber;
+    public Text redNumber;
+
     private GameObject[] redObstacles;
     private Node[] shadows;
+
+    private void Update()
+    {
+        if (Input.GetAxisRaw("Mouse ScrollWheel") > 0f)
+        {
+            currentPieceType = currentPieceType == PieceType.Red ? PieceType.Black : PieceType.Red;
+            RefreshUI();
+        }
+        else if (Input.GetAxisRaw("Mouse ScrollWheel") < 0f)
+        {
+            currentPieceType = currentPieceType == PieceType.Red ? PieceType.Black : PieceType.Red;
+            RefreshUI();
+        }
+    }
 
     public void SetObstacleCount(int redObstacle, int blackObstacle)
     {
@@ -25,6 +46,8 @@ public class ObstaclePlacement : MonoBehaviour
 
         redObstacles = new GameObject[numberOfRedObstacles];
         shadows = new Node[numberOfRedObstacles];
+
+        RefreshUI();
     }
 
     public void AddRedObstacle(GameObject redObstacle, Node shadow, int id)
@@ -46,6 +69,25 @@ public class ObstaclePlacement : MonoBehaviour
             shadows[id].SetNodeType(NodeType.Light);
         }
         numberOfRedObstacles++;
+
+        RefreshUI();
+    }
+
+    public void RefreshUI()
+    {
+        if(currentPieceType == PieceType.Black)
+        {
+            blackHighlight.SetActive(true);
+            redHighlight.SetActive(false);
+        }
+        else if(currentPieceType == PieceType.Red)
+        {
+            blackHighlight.SetActive(false);
+            redHighlight.SetActive(true);
+        }
+
+        blackNumber.text = "x" + numberOfBlackObstacles;
+        redNumber.text = "x" + numberOfRedObstacles;
     }
 
 }

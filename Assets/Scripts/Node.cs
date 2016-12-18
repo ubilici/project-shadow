@@ -20,11 +20,13 @@ public class Node : MonoBehaviour
     private GameObject tObstacle;
     private GridManager gridManager;
     private ObstaclePlacement obstaclePlacement;
+    private GameManager gameManager;
 
     private void Start()
     {
         gridManager = FindObjectOfType<GridManager>();
         obstaclePlacement = FindObjectOfType<ObstaclePlacement>();
+        gameManager = FindObjectOfType<GameManager>();
     }
 
     public void SetNodeVariables(int x, int z)
@@ -35,8 +37,11 @@ public class Node : MonoBehaviour
 
     public void SetNodeType(NodeType nodeType)
     {
-        this.nodeType = nodeType;
-        SetColor(nodeType);
+        if (this.nodeType != NodeType.Finish)
+        {
+            this.nodeType = nodeType;
+            SetColor(nodeType);
+        }
     }
 
     public void SetColor(NodeType nodeType)
@@ -46,10 +51,7 @@ public class Node : MonoBehaviour
             obstaclePlacement = FindObjectOfType<ObstaclePlacement>();
         }
 
-        if (GetComponent<MeshRenderer>().material.color != obstaclePlacement.colors[2])
-        {
-            GetComponent<MeshRenderer>().material.color = obstaclePlacement.colors[(int)nodeType];
-        }
+        GetComponent<MeshRenderer>().material.color = obstaclePlacement.colors[(int)nodeType];
     }
 
     public void PlacePiece(PieceType pieceType)
@@ -148,6 +150,7 @@ public class Node : MonoBehaviour
             }
 
             Redraw();
+            obstaclePlacement.RefreshUI();
         }
     }
 
@@ -163,7 +166,7 @@ public class Node : MonoBehaviour
     {
         if (collision.transform.tag == "Player")
         {
-            Debug.Log(nodeType);
+            gameManager.SetLastNode(nodeType);
         }
     }
 
