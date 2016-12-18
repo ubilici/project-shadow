@@ -7,8 +7,7 @@ public class GridManager : MonoBehaviour
     public Node nodePrefab;
     public int gridSize;
     public float nodeSize;
-
-    private Node[,] nodes;
+    public Node[,] nodes;
 
     private void Start()
     {
