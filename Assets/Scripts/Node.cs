@@ -1,6 +1,13 @@
 using System.Collections;
 using UnityEngine;
 
+public enum NodeType
+{
+    Light,
+    Shadow,
+    Finish
+}
+
 public class Node : MonoBehaviour
 {
     public GameObject transparentObstaclePrefab;
@@ -8,7 +15,7 @@ public class Node : MonoBehaviour
     public int numberOfPieces;
 
     private int x, z;
-    private bool isWalkable = false;
+    private NodeType nodeType = NodeType.Light;
     private GameObject tObstacle;
     private GridManager gridManager;
     private ObstaclePlacement obstaclePlacement;
@@ -25,13 +32,13 @@ public class Node : MonoBehaviour
         this.z = z;
     }
 
-    public void SetShadow(int value)
+    public void SetNodeType(NodeType nodeType)
     {
-        isWalkable = value == 1 ? true : false;
-        SetColor(value);
+        this.nodeType = nodeType;
+        SetColor(nodeType);
     }
 
-    public void SetColor(int value)
+    public void SetColor(NodeType nodeType)
     {
         if (obstaclePlacement == null)
         {
@@ -40,7 +47,7 @@ public class Node : MonoBehaviour
 
         if (GetComponent<MeshRenderer>().material.color != obstaclePlacement.colors[2])
         {
-            GetComponent<MeshRenderer>().material.color = obstaclePlacement.colors[value];
+            GetComponent<MeshRenderer>().material.color = obstaclePlacement.colors[(int)nodeType];
         }
     }
 
@@ -92,7 +99,7 @@ public class Node : MonoBehaviour
     {
         if (z + numberOfPieces < gridManager.gridSize)
         {
-            gridManager.nodes[x, z + numberOfPieces].SetShadow(1);
+            gridManager.nodes[x, z + numberOfPieces].SetNodeType(NodeType.Shadow);
         }
     }
 
@@ -100,7 +107,7 @@ public class Node : MonoBehaviour
     {
         if (collision.transform.tag == "Player")
         {
-            Debug.Log(isWalkable);
+            Debug.Log(nodeType);
         }
     }
 

@@ -23,13 +23,22 @@ public class LevelManager : MonoBehaviour
     public void GenerateLevel()
     {
         player.position = gridManager.nodes[startX, startZ].transform.position + Vector3.up;
-        gridManager.nodes[finishX, finishZ].SetColor(2);
+        gridManager.nodes[startX, startZ].SetNodeType(NodeType.Shadow);
+        gridManager.nodes[finishX, finishZ].SetNodeType(NodeType.Finish);
 
         if (levelPieces.Length > 0)
         {
             foreach (var levelPiece in levelPieces)
             {
-                gridManager.nodes[levelPiece.x, levelPiece.z].PlacePiece();
+                switch (levelPiece.pieceType)
+                {
+                    case PieceType.Black:
+                        gridManager.nodes[levelPiece.x, levelPiece.z].PlacePiece();
+                        break;
+                    case PieceType.Empty:
+                        Destroy(gridManager.nodes[levelPiece.x, levelPiece.z].gameObject);
+                        break;
+                }
             }
         }
     }
