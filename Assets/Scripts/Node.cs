@@ -7,10 +7,30 @@ public class Node : MonoBehaviour
     public GameObject obstaclePrefab;
     public int numberOfPieces;
 
+    private int gridSize, x, z;
+    private bool isWalkable = false;
     private GameObject tObstacle;
     private GameObject obstacle;
-    private GridManager grid;
+    private GridManager gridManager;
     private ObstaclePlacement obstaclePlacement;
+
+    private void Start()
+    {
+        gridManager = FindObjectOfType<GridManager>();
+        obstaclePlacement = FindObjectOfType<ObstaclePlacement>();
+    }
+
+    public void SetNodeVariables(int x, int z)
+    {
+        this.x = x;
+        this.z = z;
+    }
+
+    public void SetShadow(int value)
+    {
+        isWalkable = value == 1 ? true : false;
+        GetComponent<MeshRenderer>().material.color = obstaclePlacement.colors[value];
+    }
 
     private void OnMouseEnter()
     {
@@ -31,5 +51,14 @@ public class Node : MonoBehaviour
         obstacle.transform.position = this.transform.position + Vector3.up * 0.8f + Vector3.up * 1.5f * numberOfPieces;
 
         numberOfPieces++;
+        FindNextNode();
+    }
+
+    private void FindNextNode()
+    {
+        if (z + numberOfPieces < gridManager.gridSize)
+        {
+            gridManager.nodes[x, z + numberOfPieces].SetShadow(1);
+        }
     }
 }

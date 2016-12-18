@@ -28,6 +28,7 @@ public class GridManager : MonoBehaviour
                 Node node = Instantiate(nodePrefab, transform) as Node;
                 node.transform.position = currentPoint;
                 node.transform.name = x + "_" + z;
+                node.SetNodeVariables(x, z);
 
                 nodes[x, z] = node;
 
