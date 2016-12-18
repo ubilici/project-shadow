@@ -12,10 +12,17 @@ public class GridManager : MonoBehaviour
     [HideInInspector]
     public float nodeSize;
     private float distanceBetweenNodes;
+    private LevelManager levelManager;
+
+    private void Awake()
+    {
+        levelManager = FindObjectOfType<LevelManager>();
+    }
 
     private void Start()
     {
         CreateGrid();
+        levelManager.GenerateLevel();
     }
 
     private void CreateGrid()

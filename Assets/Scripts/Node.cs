@@ -10,7 +10,6 @@ public class Node : MonoBehaviour
     private int x, z;
     private bool isWalkable = false;
     private GameObject tObstacle;
-    private GameObject obstacle;
     private GridManager gridManager;
     private ObstaclePlacement obstaclePlacement;
 
@@ -29,7 +28,36 @@ public class Node : MonoBehaviour
     public void SetShadow(int value)
     {
         isWalkable = value == 1 ? true : false;
-        GetComponent<MeshRenderer>().material.color = obstaclePlacement.colors[value];
+        SetColor(value);
+    }
+
+    public void SetColor(int value)
+    {
+        if (obstaclePlacement == null)
+        {
+            obstaclePlacement = FindObjectOfType<ObstaclePlacement>();
+        }
+
+        if (GetComponent<MeshRenderer>().material.color != obstaclePlacement.colors[2])
+        {
+            GetComponent<MeshRenderer>().material.color = obstaclePlacement.colors[value];
+        }
+    }
+
+    public void PlacePiece()
+    {
+        if(gridManager == null)
+        {
+            gridManager = FindObjectOfType<GridManager>();
+        }
+
+        GameObject obstacle = Instantiate(obstaclePrefab) as GameObject;
+        obstacle.transform.localScale = Vector3.one * gridManager.nodeSize;
+        obstacle.transform.SetParent(transform);
+        obstacle.transform.position = this.transform.position + Vector3.up * gridManager.nodeSize / 2 + Vector3.up * gridManager.nodeSize * numberOfPieces;
+
+        numberOfPieces++;
+        FindNextNode();
     }
 
     private void OnMouseEnter()
@@ -54,14 +82,7 @@ public class Node : MonoBehaviour
 
     private void OnMouseDown()
     {
-        obstacle = Instantiate(obstaclePrefab);
-        obstacle.transform.localScale = Vector3.one * gridManager.nodeSize;
-        obstacle.transform.SetParent(transform);
-        obstacle.transform.position = this.transform.position + Vector3.up * gridManager.nodeSize / 2 + Vector3.up * gridManager.nodeSize * numberOfPieces;
-
-        numberOfPieces++;
-        FindNextNode();
-
+        PlacePiece();
         Redraw();
     }
 
