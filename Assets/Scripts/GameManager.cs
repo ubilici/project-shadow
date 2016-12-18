@@ -6,10 +6,17 @@ public class GameManager : MonoBehaviour
 {
     public NodeType lastNode;
     public float lifetimeOnLight;
+    public Material shadowMaterial;
 
     private bool lightCountdownStarted;
     private float lightCountdown;
     private bool levelOver;
+    private SceneLoader sceneLoader;
+
+    private void Awake()
+    {
+        sceneLoader = FindObjectOfType<SceneLoader>();
+    }
 
     public void SetLastNode(NodeType nodeType)
     {
@@ -42,19 +49,22 @@ public class GameManager : MonoBehaviour
         {
             if (lightCountdown >= lifetimeOnLight)
             {
-                Debug.Log("Game Over");
+                sceneLoader.ReloadLevel();
                 levelOver = true;
             }
 
             if (lastNode == NodeType.Finish)
             {
-                Debug.Log("You Win");
+                sceneLoader.LoadNextLevel();
                 levelOver = true;
             }
         }
 
+        SetShadowMag();
     }
 
-
-
+    private void SetShadowMag()
+    {
+        shadowMaterial.SetFloat("_InkBleedMag", Mathf.Lerp(0.001f, 0.01f, lightCountdown / lifetimeOnLight));
+    }
 }
