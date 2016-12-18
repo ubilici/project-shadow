@@ -38,7 +38,8 @@ public class LevelManager : MonoBehaviour
 public enum PieceType
 {
     Black,
-    Red
+    Red,
+    Empty
 }
 
 [System.Serializable]

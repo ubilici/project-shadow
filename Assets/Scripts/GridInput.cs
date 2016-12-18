@@ -2,17 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum RotateDirections
+public enum HorizontalDirections
 {
     PositiveX,
-    PositiveZ,
     NegativeX,
+    None
+}
+
+public enum VerticalDirections
+{
+    PositiveZ,
     NegativeZ,
     None
 }
 
 public class GridInput : MonoBehaviour
 {
+    public bool enableKeyboardControls;
     public Transform grid;
     public float rotationSpeed;
     public float leanSpeed;
@@ -21,15 +27,26 @@ public class GridInput : MonoBehaviour
     private bool fixRotation;
     private float lerpTime;
     private Quaternion startRotation;
-    private RotateDirections currentDirection = RotateDirections.None;
+    private HorizontalDirections horizontalDirection = HorizontalDirections.None;
+    private VerticalDirections verticalDirection = VerticalDirections.None;
 
-    public void SetDirection(RotateDirections rotateDirection)
+    public void SetDirection(HorizontalDirections rotateDirection)
     {
-        currentDirection = rotateDirection;
+        horizontalDirection = rotateDirection;
+    }
+
+    public void SetDirection(VerticalDirections rotateDirection)
+    {
+        verticalDirection = rotateDirection;
     }
 
     private void Update()
     {
+        if (enableKeyboardControls)
+        {
+            CheckInput();
+        }
+
         RotateGrid();
 
         if (fixRotation)
@@ -41,25 +58,35 @@ public class GridInput : MonoBehaviour
 
     private void RotateGrid()
     {
-        switch (currentDirection)
+        switch (horizontalDirection)
         {
-            case RotateDirections.PositiveX:
+            case HorizontalDirections.PositiveX:
                 fixRotation = false;
                 LeanTowardsX(-1);
                 break;
-            case RotateDirections.NegativeX:
+            case HorizontalDirections.NegativeX:
                 fixRotation = false;
                 LeanTowardsX(1);
                 break;
-            case RotateDirections.PositiveZ:
+            case HorizontalDirections.None:
+                if (!fixRotation)
+                {
+                    FixRotation();
+                }
+                break;
+        }
+
+        switch (verticalDirection)
+        {
+            case VerticalDirections.PositiveZ:
                 fixRotation = false;
                 LeanTowardsZ(-1);
                 break;
-            case RotateDirections.NegativeZ:
+            case VerticalDirections.NegativeZ:
                 fixRotation = false;
                 LeanTowardsZ(1);
                 break;
-            case RotateDirections.None:
+            case VerticalDirections.None:
                 if (!fixRotation)
                 {
                     FixRotation();
@@ -87,7 +114,7 @@ public class GridInput : MonoBehaviour
             }
             else if (grid.localEulerAngles.z < maximumLean * 2)
             {
-                grid.localEulerAngles = new Vector3(grid.localEulerAngles.x, 0, maximumLean); 
+                grid.localEulerAngles = new Vector3(grid.localEulerAngles.x, 0, maximumLean);
             }
         }
     }
@@ -121,5 +148,32 @@ public class GridInput : MonoBehaviour
         startRotation = grid.rotation;
         fixRotation = true;
         lerpTime = 0;
+    }
+
+    private void CheckInput()
+    {
+        if (Input.GetAxisRaw("Horizontal") > 0)
+        {
+            SetDirection(HorizontalDirections.NegativeX);
+        }
+        else if (Input.GetAxisRaw("Horizontal") < 0)
+        {
+            SetDirection(HorizontalDirections.PositiveX);
+        }
+
+        if (Input.GetAxisRaw("Vertical") > 0)
+        {
+            SetDirection(VerticalDirections.NegativeZ);
+        }
+        else if (Input.GetAxisRaw("Vertical") < 0)
+        {
+            SetDirection(VerticalDirections.PositiveZ);
+        }
+
+        if (Input.GetAxisRaw("Horizontal") == 0 && Input.GetAxisRaw("Vertical") == 0)
+        {
+            SetDirection(HorizontalDirections.None);
+            SetDirection(VerticalDirections.None);
+        }
     }
 }

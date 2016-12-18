@@ -53,6 +53,7 @@ public class Node : MonoBehaviour
 
         GameObject obstacle = Instantiate(obstaclePrefab) as GameObject;
         obstacle.transform.localScale = Vector3.one * gridManager.nodeSize;
+        obstacle.transform.rotation = this.transform.rotation;
         obstacle.transform.SetParent(transform);
         obstacle.transform.position = this.transform.position + Vector3.up * gridManager.nodeSize / 2 + Vector3.up * gridManager.nodeSize * numberOfPieces;
 
@@ -70,6 +71,7 @@ public class Node : MonoBehaviour
 
         tObstacle = Instantiate(transparentObstaclePrefab);
         tObstacle.transform.localScale = Vector3.one * gridManager.nodeSize;
+        tObstacle.transform.rotation = this.transform.rotation;
         tObstacle.transform.SetParent(transform);
         tObstacle.transform.position = this.transform.position + Vector3.up * gridManager.nodeSize / 2 + Vector3.up * gridManager.nodeSize * numberOfPieces;
     }
