@@ -83,11 +83,11 @@ public class GridInput : MonoBehaviour
         {
             if (grid.localEulerAngles.z > 360 - maximumLean * 2)
             {
-                grid.localEulerAngles = Vector3.back * maximumLean;
+                grid.localEulerAngles = new Vector3(grid.localEulerAngles.x, 0, maximumLean * -1);
             }
             else if (grid.localEulerAngles.z < maximumLean * 2)
             {
-                grid.localEulerAngles = Vector3.forward * maximumLean;
+                grid.localEulerAngles = new Vector3(grid.localEulerAngles.x, 0, maximumLean); 
             }
         }
     }
@@ -107,12 +107,11 @@ public class GridInput : MonoBehaviour
         {
             if (grid.localEulerAngles.x > 360 - maximumLean * 2)
             {
-                grid.localEulerAngles = Vector3.left * maximumLean;
+                grid.localEulerAngles = new Vector3(maximumLean * -1, 0, grid.localEulerAngles.z);
             }
             else if (grid.localEulerAngles.x < maximumLean * 2)
             {
-                grid.localEulerAngles = Vector3.right * maximumLean;
-
+                grid.localEulerAngles = new Vector3(maximumLean, 0, grid.localEulerAngles.z);
             }
         }
     }

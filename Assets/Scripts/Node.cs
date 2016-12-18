@@ -7,7 +7,7 @@ public class Node : MonoBehaviour
     public GameObject obstaclePrefab;
     public int numberOfPieces;
 
-    private int gridSize, x, z;
+    private int x, z;
     private bool isWalkable = false;
     private GameObject tObstacle;
     private GameObject obstacle;
@@ -35,8 +35,15 @@ public class Node : MonoBehaviour
     private void OnMouseEnter()
     {
         // Show transparent tObstacle.
-        tObstacle = Instantiate(transparentObstaclePrefab, transform);
-        tObstacle.transform.position = this.transform.position + Vector3.up * 0.8f + Vector3.up * 1.5f * numberOfPieces;
+        if(tObstacle != null)
+        {
+            Destroy(tObstacle);
+        }
+
+        tObstacle = Instantiate(transparentObstaclePrefab);
+        tObstacle.transform.localScale = Vector3.one * gridManager.nodeSize;
+        tObstacle.transform.SetParent(transform);
+        tObstacle.transform.position = this.transform.position + Vector3.up * gridManager.nodeSize / 2 + Vector3.up * gridManager.nodeSize * numberOfPieces;
     }
 
     private void OnMouseExit()
@@ -47,11 +54,15 @@ public class Node : MonoBehaviour
 
     private void OnMouseDown()
     {
-        obstacle = Instantiate(obstaclePrefab, transform);
-        obstacle.transform.position = this.transform.position + Vector3.up * 0.8f + Vector3.up * 1.5f * numberOfPieces;
+        obstacle = Instantiate(obstaclePrefab);
+        obstacle.transform.localScale = Vector3.one * gridManager.nodeSize;
+        obstacle.transform.SetParent(transform);
+        obstacle.transform.position = this.transform.position + Vector3.up * gridManager.nodeSize / 2 + Vector3.up * gridManager.nodeSize * numberOfPieces;
 
         numberOfPieces++;
         FindNextNode();
+
+        Redraw();
     }
 
     private void FindNextNode()
@@ -60,5 +71,22 @@ public class Node : MonoBehaviour
         {
             gridManager.nodes[x, z + numberOfPieces].SetShadow(1);
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.tag == "Player")
+        {
+            Debug.Log(isWalkable);
+        }
+    }
+
+    private void Redraw()
+    {
+        Destroy(tObstacle);
+        tObstacle = Instantiate(transparentObstaclePrefab);
+        tObstacle.transform.localScale = Vector3.one * gridManager.nodeSize;
+        tObstacle.transform.SetParent(transform);
+        tObstacle.transform.position = this.transform.position + Vector3.up * gridManager.nodeSize / 2 + Vector3.up * gridManager.nodeSize * numberOfPieces;
     }
 }
