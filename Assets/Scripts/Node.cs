@@ -11,7 +11,8 @@ public enum NodeType
 public class Node : MonoBehaviour
 {
     public GameObject transparentObstaclePrefab;
-    public GameObject obstaclePrefab;
+    public GameObject blackObstaclePrefab;
+    public GameObject redObstaclePrefab;
     public int numberOfPieces;
 
     private int x, z;
@@ -51,48 +52,103 @@ public class Node : MonoBehaviour
         }
     }
 
-    public void PlacePiece()
+    public void PlacePiece(PieceType pieceType)
     {
-        if(gridManager == null)
+        if (gridManager == null)
         {
             gridManager = FindObjectOfType<GridManager>();
         }
 
-        GameObject obstacle = Instantiate(obstaclePrefab) as GameObject;
-        obstacle.transform.localScale = Vector3.one * gridManager.nodeSize;
-        obstacle.transform.rotation = this.transform.rotation;
-        obstacle.transform.SetParent(transform);
-        obstacle.transform.position = this.transform.position + Vector3.up * gridManager.nodeSize / 2 + Vector3.up * gridManager.nodeSize * numberOfPieces;
+        switch (pieceType)
+        {
+            case PieceType.Black:
+                GameObject blackObstacle = Instantiate(blackObstaclePrefab) as GameObject;
+                blackObstacle.transform.localScale = Vector3.one * gridManager.nodeSize;
+                blackObstacle.transform.rotation = this.transform.rotation;
+                blackObstacle.transform.SetParent(transform);
+                blackObstacle.transform.position = this.transform.position + Vector3.up * gridManager.nodeSize / 2 + Vector3.up * gridManager.nodeSize * numberOfPieces;
 
-        numberOfPieces++;
-        FindNextNode();
+                numberOfPieces++;
+                FindNextNode();
+                break;
+
+            case PieceType.Red:
+                GameObject redObstacle = Instantiate(redObstaclePrefab) as GameObject;
+                redObstacle.transform.localScale = Vector3.one * gridManager.nodeSize;
+                redObstacle.transform.rotation = this.transform.rotation;
+                redObstacle.transform.SetParent(transform);
+                redObstacle.transform.position = this.transform.position + Vector3.up * gridManager.nodeSize / 2 + Vector3.up * gridManager.nodeSize * numberOfPieces;
+
+                numberOfPieces++;
+                FindNextNode();
+
+                if (z + numberOfPieces < gridManager.gridSize)
+                {
+                    obstaclePlacement.AddRedObstacle(redObstacle, gridManager.nodes[x, z + numberOfPieces], obstaclePlacement.numberOfRedObstacles - 1);
+                }
+                else
+                {
+                    obstaclePlacement.AddRedObstacle(redObstacle, obstaclePlacement.numberOfRedObstacles - 1);
+                }
+
+                redObstacle.GetComponent<RedObstacle>().id = obstaclePlacement.numberOfRedObstacles - 1;
+                redObstacle.GetComponent<RedObstacle>().node = this;
+
+                break;
+        }
     }
 
     private void OnMouseEnter()
     {
-        // Show transparent tObstacle.
-        if(tObstacle != null)
+        if (obstaclePlacement.remainingObstacles > 0)
         {
-            Destroy(tObstacle);
-        }
+            // Show transparent tObstacle.
+            if (tObstacle != null)
+            {
+                Destroy(tObstacle);
+            }
 
-        tObstacle = Instantiate(transparentObstaclePrefab);
-        tObstacle.transform.localScale = Vector3.one * gridManager.nodeSize;
-        tObstacle.transform.rotation = this.transform.rotation;
-        tObstacle.transform.SetParent(transform);
-        tObstacle.transform.position = this.transform.position + Vector3.up * gridManager.nodeSize / 2 + Vector3.up * gridManager.nodeSize * numberOfPieces;
+            tObstacle = Instantiate(transparentObstaclePrefab);
+            tObstacle.transform.localScale = Vector3.one * gridManager.nodeSize;
+            tObstacle.transform.rotation = this.transform.rotation;
+            tObstacle.transform.SetParent(transform);
+            tObstacle.transform.position = this.transform.position + Vector3.up * gridManager.nodeSize / 2 + Vector3.up * gridManager.nodeSize * numberOfPieces;
+        }
     }
 
     private void OnMouseExit()
     {
         // Destroy transparent tObstacle.
-        Destroy(tObstacle);
+        if (tObstacle != null)
+        {
+            Destroy(tObstacle);
+        }
     }
 
     private void OnMouseDown()
     {
-        PlacePiece();
-        Redraw();
+        if (obstaclePlacement.remainingObstacles > 0)
+        {
+            switch (obstaclePlacement.currentPieceType)
+            {
+                case PieceType.Black:
+                    if (obstaclePlacement.numberOfBlackObstacles > 0)
+                    {
+                        PlacePiece(PieceType.Black);
+                        obstaclePlacement.numberOfBlackObstacles--;
+                    }
+                    break;
+                case PieceType.Red:
+                    if (obstaclePlacement.numberOfRedObstacles > 0)
+                    {
+                        PlacePiece(PieceType.Red);
+                        obstaclePlacement.numberOfRedObstacles--;
+                    }
+                    break;
+            }
+
+            Redraw();
+        }
     }
 
     private void FindNextNode()

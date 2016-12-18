@@ -1,15 +1,51 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ObstaclePlacement : MonoBehaviour
 {
+    public PieceType currentPieceType;
+    public int numberOfBlackObstacles;
+    public int numberOfRedObstacles;
+    public int remainingObstacles
+    {
+        get
+        {
+            return numberOfBlackObstacles + numberOfRedObstacles;
+        }
+    }
     public Color[] colors;          // 0 - light / 1 - dark / 2 - finish
 
-    private GridManager grid;
+    private GameObject[] redObstacles;
+    private Node[] shadows;
 
-    private void Awake()
+    public void SetObstacleCount(int redObstacle, int blackObstacle)
     {
-        grid = FindObjectOfType<GridManager>();
+        numberOfBlackObstacles = blackObstacle;
+        numberOfRedObstacles = redObstacle;
+
+        redObstacles = new GameObject[numberOfRedObstacles];
+        shadows = new Node[numberOfRedObstacles];
     }
+
+    public void AddRedObstacle(GameObject redObstacle, Node shadow, int id)
+    {
+        redObstacles[id] = redObstacle;
+        shadows[id] = shadow;
+    }
+
+    public void AddRedObstacle(GameObject redObstacle, int id)
+    {
+        redObstacles[id] = redObstacle;
+    }
+
+    public void RemoveRedObstacle(int id)
+    {
+        Destroy(redObstacles[id]);
+        if (shadows[id] != null)
+        {
+            shadows[id].SetNodeType(NodeType.Light);
+        }
+        numberOfRedObstacles++;
+    }
+
 }
